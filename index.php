@@ -1,0 +1,337 @@
+<?php
+/**
+ * A porta de entrada do sistema — todo acesso passa por aqui.
+ *
+ * Funciona assim: a URL carrega dois parâmetros, "entidade" e "acao".
+ * Com base neles, o sistema decide qual controller chamar e o que fazer.
+ *
+ *   index.php?entidade=imovel&acao=listar   → lista os imóveis
+ *   index.php?entidade=cliente&acao=novo    → abre o formulário de novo cliente
+ *
+ * Esse padrão tem nome: Front Controller. Em vez de ter um arquivo PHP
+ * separado pra cada funcionalidade espalhado pelo projeto, tudo passa por
+ * um único ponto central. Muito mais fácil de controlar e de entender o fluxo.
+ */
+
+session_start();
+
+require_once __DIR__ . '/config/conexao.php';
+require_once __DIR__ . '/controller/ImovelController.php';
+require_once __DIR__ . '/controller/ProprietarioController.php';
+require_once __DIR__ . '/controller/CorretorController.php';
+require_once __DIR__ . '/controller/ClienteController.php';
+require_once __DIR__ . '/controller/ContratoController.php';
+require_once __DIR__ . '/controller/VisitaController.php';
+
+if (empty($_SESSION['usuario_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+// Pega os parâmetros da URL; se não vier nada, cai na home
+$entidade = $_GET['entidade'] ?? 'home';
+$acao     = $_GET['acao']     ?? 'listar';
+
+// Todos os controllers do sistema registrados aqui
+$controllers = [
+    'imovel'       => new ImovelController(),
+    'proprietario' => new ProprietarioController(),
+    'corretor'     => new CorretorController(),
+    'cliente'      => new ClienteController(),
+    'contrato'     => new ContratoController(),
+    'visita'       => new VisitaController(),
+];
+
+// Bloqueia qualquer entidade que não esteja no array acima — segurança básica
+if ($entidade !== 'home' && !isset($controllers[$entidade])) {
+    http_response_code(404);
+    exit('Modulo invalido');
+}
+
+// Processa o formulário quando o método é POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $entidade !== 'home' && $acao === 'salvar') {
+    $controllers[$entidade]->salvar($_POST);
+    // Redireciona pra listagem depois de salvar — padrão PRG (Post/Redirect/Get).
+    // Sem isso, atualizar a página reenviaria o formulário e duplicaria o registro.
+    header('Location: index.php?entidade=' . $entidade . '&acao=listar');
+    exit;
+}
+
+// Processa a exclusão — o ID vem na URL via GET
+if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
+    $controllers[$entidade]->excluir((int) $_GET['id']);
+    header('Location: index.php?entidade=' . $entidade . '&acao=listar');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imobiliária</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="left-menu">
+        <h1>Imobiliária</h1>
+        <!-- Menu de navegação — aparece em todas as páginas -->
+        <nav>
+            <a href="index.php" class="<?= $entidade === 'home' ? 'active' : '' ?>">Home</a>
+            <a href="index.php?entidade=imovel&acao=listar" class="<?= $entidade === 'imovel' ? 'active' : '' ?>">Imóveis</a>
+            <a href="index.php?entidade=proprietario&acao=listar" class="<?= $entidade === 'proprietario' ? 'active' : '' ?>">Proprietários</a>
+            <a href="index.php?entidade=corretor&acao=listar" class="<?= $entidade === 'corretor' ? 'active' : '' ?>">Corretores</a>
+            <a href="index.php?entidade=cliente&acao=listar" class="<?= $entidade === 'cliente' ? 'active' : '' ?>">Clientes</a>
+            <a href="index.php?entidade=contrato&acao=listar" class="<?= $entidade === 'contrato' ? 'active' : '' ?>">Contratos</a>
+            <a href="index.php?entidade=visita&acao=listar" class="<?= $entidade === 'visita' ? 'active' : '' ?>">Visitas</a>
+        </nav>
+        </div>
+        <div class="user-box">
+            <span><?= htmlspecialchars((string) ($_SESSION['usuario_nome'] ?? '')) ?></span>
+            <a href="logout.php">Sair</a>
+        </div>
+    </div>
+</header>
+
+<main>
+
+    <?php if ($entidade === 'home'): ?>
+        <!-- Tela inicial -->
+        <p class="text-sm text-gray-500">Escolha um modulo no menu acima.</p>
+
+    <?php elseif ($acao === 'novo' || $acao === 'editar'): ?>
+        <?php
+        /**
+         * Carrega o formulário certo de acordo com a entidade acessada.
+         * Cada bloco prepara as variáveis que a view precisa e faz o include.
+         */
+        if ($entidade === 'imovel'):
+            $controller    = $controllers['imovel'];
+            // Na edição, busca o imóvel existente; no novo cadastro, passa null
+            $imovel        = $acao === 'editar' ? $controller->buscarPorId((int) ($_GET['id'] ?? 0)) : null;
+            $proprietarios = $controller->listarProprietarios(); // preenche o select de proprietários
+            require __DIR__ . '/view/imovel/form.php';
+
+        elseif ($entidade === 'proprietario'):
+            $controller  = $controllers['proprietario'];
+            $proprietario = $acao === 'editar' ? $controller->buscarPorId((int) ($_GET['id'] ?? 0)) : null;
+            require __DIR__ . '/view/proprietario/form.php';
+
+        elseif ($entidade === 'corretor'):
+            $controller = $controllers['corretor'];
+            $corretor   = $acao === 'editar' ? $controller->buscarPorId((int) ($_GET['id'] ?? 0)) : null;
+            require __DIR__ . '/view/corretor/form.php';
+
+        elseif ($entidade === 'cliente'):
+            $controller = $controllers['cliente'];
+            $cliente    = $acao === 'editar' ? $controller->buscarPorId((int) ($_GET['id'] ?? 0)) : null;
+            require __DIR__ . '/view/cliente/form.php';
+
+        elseif ($entidade === 'contrato'):
+            $controller = $controllers['contrato'];
+            $contrato   = $acao === 'editar' ? $controller->buscarPorId((int) ($_GET['id'] ?? 0)) : null;
+            // Carrega as listas pra popular os três selects do formulário
+            $imoveis    = $controller->listarImoveis();
+            $clientes   = $controller->listarClientes();
+            $corretores = $controller->listarCorretores();
+            require __DIR__ . '/view/contrato/form.php';
+
+        elseif ($entidade === 'visita'):
+            $controller = $controllers['visita'];
+            $visita     = $acao === 'editar' ? $controller->buscarPorId((int) ($_GET['id'] ?? 0)) : null;
+            $imoveis    = $controller->listarImoveis();
+            require __DIR__ . '/view/visita/form.php';
+        endif;
+        ?>
+
+    <?php else: ?>
+        <?php
+        // Ação padrão: lista os registros da entidade acessada
+        // Imóveis aceitam um filtro de finalidade via GET
+        $filtroFinalidade = ($entidade === 'imovel') ? ($_GET['finalidade'] ?? '') : '';
+        $itens = ($entidade === 'imovel')
+            ? $controllers[$entidade]->listar($filtroFinalidade)
+            : $controllers[$entidade]->listar();
+        ?>
+        <h2 class="text-xl font-semibold text-gray-900 mb-1"><?= ucfirst($entidade) ?></h2>
+        <p class="mb-4"><a class="bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded hover:bg-gray-700 transition inline-flex items-center" href="index.php?entidade=<?= $entidade ?>&acao=novo">+ Novo</a></p>
+
+        <?php if ($entidade === 'proprietario'): ?>
+            <table class="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
+                <tr class="hover:bg-gray-50">
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">ID</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Nome</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">CPF</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Telefone</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Email</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Acoes</th>
+                </tr>
+                <?php foreach ($itens as $r): ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getId() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getNome()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getCpf()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getTelefone()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getEmail()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
+                        <a class="text-xs text-gray-500 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-gray-100 transition" href="index.php?entidade=proprietario&acao=editar&id=<?= $r->getId() ?>">Editar</a>
+                        <!-- confirm() pede confirmação antes de excluir — evita exclusão por engano -->
+                        <a class="text-xs text-red-500 hover:text-red-700 px-2 py-0.5 rounded hover:bg-red-50 transition" href="index.php?entidade=proprietario&acao=excluir&id=<?= $r->getId() ?>"
+                           onclick="return confirm('Excluir registro?')">Excluir</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+
+        <?php elseif ($entidade === 'corretor'): ?>
+            <table class="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
+                <tr class="hover:bg-gray-50">
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">ID</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Nome</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">CRECI</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Telefone</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Email</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Acoes</th>
+                </tr>
+                <?php foreach ($itens as $r): ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getId() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getNome()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getCreci()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getTelefone()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getEmail()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
+                        <a class="text-xs text-gray-500 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-gray-100 transition" href="index.php?entidade=corretor&acao=editar&id=<?= $r->getId() ?>">Editar</a>
+                        <a class="text-xs text-red-500 hover:text-red-700 px-2 py-0.5 rounded hover:bg-red-50 transition" href="index.php?entidade=corretor&acao=excluir&id=<?= $r->getId() ?>"
+                           onclick="return confirm('Excluir registro?')">Excluir</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+
+        <?php elseif ($entidade === 'cliente'): ?>
+            <table class="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
+                <tr class="hover:bg-gray-50">
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">ID</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Nome</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">CPF</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Telefone</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Email</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Interesse</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Acoes</th>
+                </tr>
+                <?php foreach ($itens as $r): ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getId() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getNome()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getCpf()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getTelefone()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getEmail()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getInteresse()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
+                        <a class="text-xs text-gray-500 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-gray-100 transition" href="index.php?entidade=cliente&acao=editar&id=<?= $r->getId() ?>">Editar</a>
+                        <a class="text-xs text-red-500 hover:text-red-700 px-2 py-0.5 rounded hover:bg-red-50 transition" href="index.php?entidade=cliente&acao=excluir&id=<?= $r->getId() ?>"
+                           onclick="return confirm('Excluir registro?')">Excluir</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+
+        <?php elseif ($entidade === 'imovel'): ?>
+            <!-- Filtro de finalidade: mostra só os imóveis pra venda ou só pra aluguel -->
+            <div class="flex items-center gap-2 mb-3">
+                <a class="border border-gray-200 rounded-full text-xs text-gray-500 hover:text-gray-900 px-3 py-1 <?= $filtroFinalidade === '' ? 'bg-gray-100 text-gray-900' : '' ?>" href="index.php?entidade=imovel&acao=listar">Todos</a>
+                <a class="border border-gray-200 rounded-full text-xs text-gray-500 hover:text-gray-900 px-3 py-1 <?= $filtroFinalidade === 'venda' ? 'bg-gray-100 text-gray-900' : '' ?>" href="index.php?entidade=imovel&acao=listar&finalidade=venda">Comprar</a>
+                <a class="border border-gray-200 rounded-full text-xs text-gray-500 hover:text-gray-900 px-3 py-1 <?= $filtroFinalidade === 'aluguel' ? 'bg-gray-100 text-gray-900' : '' ?>" href="index.php?entidade=imovel&acao=listar&finalidade=aluguel">Alugar</a>
+                <?php if ($filtroFinalidade): ?>
+                    <span class="text-xs text-gray-500">mostrando apenas: <strong class="text-gray-900"><?= ucfirst($filtroFinalidade) ?></strong></span>
+                <?php endif; ?>
+            </div>
+            <table class="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
+                <tr class="hover:bg-gray-50">
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">ID</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Titulo</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Tipo</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Endereco</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Metros²</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Valor</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Finalidade</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Status</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Proprietario</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Planta</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Acoes</th>
+                </tr>
+                <?php foreach ($itens as $r): ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getId() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getTitulo()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getTipo()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getEndereco()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getMetrosQuadrados() ? number_format($r->getMetrosQuadrados(), 0, ',', '.') . ' m²' : '—' ?></td>
+                    <!-- number_format transforma o número em formato de moeda brasileira -->
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">R$ <?= number_format($r->getValor(), 2, ',', '.') ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getFinalidade()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getStatus()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getNomeProprietario()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
+                        <?php if ($r->getPlantaBaixa()): ?>
+                            <!-- Abre a planta baixa em nova aba -->
+                            <a class="text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100" href="uploads/<?= htmlspecialchars($r->getPlantaBaixa()) ?>" target="_blank">Ver planta</a>
+                        <?php else: ?>
+                            —
+                        <?php endif; ?>
+                    </td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
+                        <a class="text-xs text-gray-500 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-gray-100 transition" href="index.php?entidade=imovel&acao=editar&id=<?= $r->getId() ?>">Editar</a>
+                        <a class="text-xs text-red-500 hover:text-red-700 px-2 py-0.5 rounded hover:bg-red-50 transition" href="index.php?entidade=imovel&acao=excluir&id=<?= $r->getId() ?>"
+                           onclick="return confirm('Excluir registro?')">Excluir</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+
+        <?php elseif ($entidade === 'contrato'): ?>
+            <table class="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
+                <tr class="hover:bg-gray-50">
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">ID</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Imovel</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Cliente</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Corretor</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Tipo</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Valor</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Inicio</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Fim</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Acoes</th>
+                </tr>
+                <?php foreach ($itens as $r): ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getId() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getImovelTitulo()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getClienteNome()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getCorretorNome()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getTipo()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">R$ <?= number_format($r->getValor(), 2, ',', '.') ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getDataInicio()) ?></td>
+                    <!-- Contrato de venda pode não ter data fim — mostra vazio quando null -->
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars((string) $r->getDataFim()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
+                        <a class="text-xs text-gray-500 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-gray-100 transition" href="index.php?entidade=contrato&acao=editar&id=<?= $r->getId() ?>">Editar</a>
+                        <a class="text-xs text-red-500 hover:text-red-700 px-2 py-0.5 rounded hover:bg-red-50 transition" href="index.php?entidade=contrato&acao=excluir&id=<?= $r->getId() ?>"
+                           onclick="return confirm('Excluir registro?')">Excluir</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        <?php elseif ($entidade === 'visita'): ?>
+            <table class="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
+                <tr class="hover:bg-gray-50">
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">ID</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Imovel</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Nome</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">E-mail</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Celular</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Dia</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Periodo</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Acoes</th>
+                </tr>
+                <?php
+                // Nomes legíveis dos dias e períodos pra exibição na tabela
+                $diasLabel = [
+                    'segunda' => 'Segunda', 'terca' => 'Terça', 'quarta' => 'Quarta',
+                    'quinta'  => 'Quinta',  'sexta' => 'Sexta', 'sabado' => 'Sábado',
+                    'domingo' => 'Domingo',
+                ];
+                $periodosLabel = ['manha' => 'Manhã', 'tarde' => 'Tarde', 'noite' => 'Noite'];
+                foreach ($itens as $r):
+                ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getId() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getImovelTitulo()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getNome()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getEmail()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getCelular()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $diasLabel[$r->getDiaSemana()] ?? $r->getDiaSemana() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $periodosLabel[$r->getPeriodo()] ?? $r->getPeriodo() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
+                        <a class="text-xs text-gray-500 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-gray-100 transition" href="index.php?entidade=visita&acao=editar&id=<?= $r->getId() ?>">Editar</a>
+                        <a class="text-xs text-red-500 hover:text-red-700 px-2 py-0.5 rounded hover:bg-red-50 transition" href="index.php?entidade=visita&acao=excluir&id=<?= $r->getId() ?>"
+                           onclick="return confirm('Excluir registro?')">Excluir</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        <?php endif; ?>
+    <?php endif; ?>
+
+</main>
+</body>
+</html>
