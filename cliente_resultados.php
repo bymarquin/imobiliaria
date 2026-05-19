@@ -75,6 +75,9 @@ $imoveisFiltrados = array_values(array_filter($imoveis, static function ($imovel
                 <p><strong>Area:</strong> <?= $imovel->getMetrosQuadrados() ? number_format($imovel->getMetrosQuadrados(), 0, ',', '.') . ' m²' : 'Nao informado' ?></p>
                 <div class="portal-card-footer">
                     <span class="portal-status">Disponivel</span>
+                    <a href="cliente_interesse.php?id_imovel=<?= $imovel->getId() ?>&interesse=<?= $imovel->getFinalidade() === 'aluguel' ? 'aluguel' : 'compra' ?>" class="portal-btn-visita">
+                        <?= $imovel->getFinalidade() === 'aluguel' ? 'Quero Alugar' : 'Quero Comprar' ?>
+                    </a>
                     <a href="cliente_visita.php?id_imovel=<?= $imovel->getId() ?>" class="portal-btn-visita">Agendar Visita</a>
                 </div>
             </article>
