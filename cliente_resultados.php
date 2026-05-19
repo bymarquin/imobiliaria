@@ -50,7 +50,13 @@ $imoveisFiltrados = array_values(array_filter($imoveis, static function ($imovel
 
 <main>
     <h2>Imoveis encontrados</h2>
-    <p>Resultados com base nos filtros informados.</p>
+    <p>Resultados com base nos filtros informados.
+    <?php if ($finalidade === 'venda'): ?>
+        <strong>Comprar</strong>
+    <?php elseif ($finalidade === 'aluguel'): ?>
+        <strong>Alugar</strong>
+    <?php endif; ?>
+    </p>
 
     <div class="portal-grid">
         <?php foreach ($imoveisFiltrados as $imovel): ?>
@@ -67,7 +73,10 @@ $imoveisFiltrados = array_values(array_filter($imoveis, static function ($imovel
                 <p><strong>Endereco:</strong> <?= htmlspecialchars($imovel->getEndereco()) ?></p>
                 <p><strong>Valor:</strong> R$ <?= number_format($imovel->getValor(), 2, ',', '.') ?></p>
                 <p><strong>Area:</strong> <?= $imovel->getMetrosQuadrados() ? number_format($imovel->getMetrosQuadrados(), 0, ',', '.') . ' m²' : 'Nao informado' ?></p>
-                <span class="portal-status">Disponivel</span>
+                <div class="portal-card-footer">
+                    <span class="portal-status">Disponivel</span>
+                    <a href="cliente_visita.php?id_imovel=<?= $imovel->getId() ?>" class="portal-btn-visita">Agendar Visita</a>
+                </div>
             </article>
         <?php endforeach; ?>
     </div>

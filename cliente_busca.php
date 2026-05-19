@@ -25,7 +25,23 @@ $valorMax = $_GET['valor_max'] ?? '';
 
 <main>
     <h2>Encontre seu imovel</h2>
-    <p>Escolha os filtros e veja os resultados da busca.</p>
+    <p>O que voce esta procurando?</p>
+
+    <div class="portal-opcoes">
+        <a href="cliente_resultados.php?finalidade=venda" class="portal-opcao portal-opcao-comprar">
+            <span class="portal-opcao-icone">🏠</span>
+            <strong>Quero Comprar</strong>
+            <span>Ver imoveis a venda</span>
+        </a>
+        <a href="cliente_resultados.php?finalidade=aluguel" class="portal-opcao portal-opcao-alugar">
+            <span class="portal-opcao-icone">🔑</span>
+            <strong>Quero Alugar</strong>
+            <span>Ver imoveis para aluguel</span>
+        </a>
+    </div>
+
+    <hr class="portal-divisor">
+    <p class="portal-filtro-titulo">Ou use os filtros avancados:</p>
 
     <form method="get" action="cliente_resultados.php">
         <label>Finalidade
