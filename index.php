@@ -308,7 +308,7 @@ if ($entidade === 'contrato' && $acao === 'encerrar' && isset($_GET['id'])) {
                                 <span class="text-xs text-red-500">arquivo nao encontrado</span>
                             <?php endif; ?>
                         <?php else: ?>
-                            —
+                            <a class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200" href="index.php?entidade=imovel&acao=editar&id=<?= $r->getId() ?>">Adicionar planta</a>
                         <?php endif; ?>
                     </td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
@@ -395,7 +395,7 @@ if ($entidade === 'contrato' && $acao === 'encerrar' && isset($_GET['id'])) {
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getEmail()) ?></td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getCelular()) ?></td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $diasLabel[$r->getDiaSemana()] ?? $r->getDiaSemana() ?></td>
-                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $periodosLabel[$r->getPeriodo()] ?? $r->getPeriodo() ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getHorarioPreferencia() ?? $periodosLabel[$r->getPeriodo()] ?? $r->getPeriodo()) ?></td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
                         <a class="text-xs text-gray-500 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-gray-100 transition" href="index.php?entidade=visita&acao=editar&id=<?= $r->getId() ?>">Editar</a>
                         <a class="text-xs text-red-500 hover:text-red-700 px-2 py-0.5 rounded hover:bg-red-50 transition" href="index.php?entidade=visita&acao=excluir&id=<?= $r->getId() ?>"
