@@ -68,26 +68,23 @@ $diasLabel = [
             <div class="login-erro"><?= htmlspecialchars($erro) ?></div>
         <?php endif; ?>
 
-        <form method="post" class="bg-white border border-gray-200 rounded-lg p-7 max-w-lg flex flex-col gap-5">
+        <form method="post">
             <input type="hidden" name="id_imovel" value="<?= $imovel->getId() ?>">
 
-            <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Seu nome
-                <input type="text" name="nome" required placeholder="Nome completo"
-                       class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 transition">
+            <label>Seu nome
+                <input type="text" name="nome" required placeholder="Nome completo">
             </label>
 
-            <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">E-mail
-                <input type="email" name="email" required placeholder="seu@email.com"
-                       class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 transition">
+            <label>E-mail
+                <input type="email" name="email" required placeholder="seu@email.com">
             </label>
 
-            <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Celular
-                <input type="text" name="celular" required placeholder="(00) 00000-0000"
-                       class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 transition">
+            <label>Celular
+                <input type="text" name="celular" required placeholder="(00) 00000-0000">
             </label>
 
-            <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Dia preferido
-                <select name="dia_semana" required class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 transition">
+            <label>Dia preferido
+                <select name="dia_semana" required>
                     <option value="" disabled selected>Selecione o dia</option>
                     <?php foreach ($dias as $d): ?>
                     <option value="<?= $d ?>"><?= $diasLabel[$d] ?></option>
@@ -95,13 +92,12 @@ $diasLabel = [
                 </select>
             </label>
 
-            <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Horario preferido
-                <input type="time" name="horario_preferencia" required
-                       class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 transition">
+            <label>Horario preferido
+                <input type="time" name="horario_preferencia" required>
             </label>
 
-            <button type="submit" class="self-start bg-gray-900 text-white text-xs font-medium px-5 py-2 rounded-md hover:bg-gray-700 transition cursor-pointer">Confirmar Agendamento</button>
-            <a href="javascript:history.back()" class="self-start text-xs text-gray-400 hover:text-gray-700 hover:underline transition">Voltar</a>
+            <button type="submit">Confirmar Agendamento</button>
+            &nbsp;<a href="javascript:history.back()">Voltar</a>
         </form>
     <?php endif; ?>
 </main>

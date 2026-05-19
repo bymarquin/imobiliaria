@@ -108,52 +108,49 @@ p {
 .portal-opcoes {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin: 16px 0;
+    gap: 8px;
+    margin: 12px 0;
 }
 
 .portal-opcao {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 24px 16px;
-    border-radius: 8px;
+    display: block;
+    padding: 14px 10px;
+    border: 2px outset #d6d6d6;
+    background: linear-gradient(#f2f2f2, #d8d8d8);
     text-decoration: none;
     text-align: center;
-    transition: opacity 0.15s;
+    color: #000080;
+    font-weight: bold;
 }
 
-.portal-opcao:hover { opacity: 0.85; }
-
-.portal-opcao-comprar {
-    background: #dbeafe;
-    border: 2px solid #93c5fd;
-    color: #1d4ed8;
+.portal-opcao:hover {
+    background: linear-gradient(#f7f7f7, #e0e0e0);
+    color: #000080;
 }
 
-.portal-opcao-alugar {
-    background: #d1fae5;
-    border: 2px solid #6ee7b7;
-    color: #065f46;
+.portal-opcao:active {
+    border: 2px inset #d6d6d6;
 }
 
-.portal-opcao-icone { font-size: 28px; }
+.portal-opcao-comprar { border-left: 4px solid #000080; }
 
-.portal-opcao strong { font-size: 15px; }
+.portal-opcao-alugar { border-left: 4px solid #006400; }
 
-.portal-opcao span { font-size: 11px; opacity: 0.75; }
+.portal-opcao-icone { display: block; font-size: 22px; margin-bottom: 4px; }
+
+.portal-opcao strong { display: block; font-size: 13px; }
+
+.portal-opcao span { font-size: 11px; color: #444; font-weight: normal; }
 
 .portal-divisor {
-    border: none;
-    border-top: 1px solid #d4d4d4;
-    margin: 18px 0 10px;
+    border: 0;
+    border-top: 1px solid #aaa;
+    margin: 14px 0;
 }
 
 .portal-filtro-titulo {
     font-size: 12px;
-    color: #666;
+    color: #444;
     margin-bottom: 6px;
 }
 
@@ -162,20 +159,25 @@ p {
     align-items: center;
     justify-content: space-between;
     margin-top: 8px;
+    border-top: 1px solid #d4d4d4;
+    padding-top: 6px;
 }
 
 .portal-btn-visita {
     font-size: 11px;
     font-weight: bold;
-    padding: 4px 10px;
-    border-radius: 6px;
-    background: #111827;
-    color: #fff;
+    padding: 3px 8px;
+    background: linear-gradient(#f2f2f2, #d4d4d4);
+    border: 1px solid;
+    border-color: #fff #666 #666 #fff;
+    color: #000080;
     text-decoration: none;
-    transition: background 0.15s;
 }
 
-.portal-btn-visita:hover { background: #374151; }
+.portal-btn-visita:hover {
+    background: linear-gradient(#f7f7f7, #dcdcdc);
+    color: #000080;
+}
 
 .home-card,
 .portal-card {
@@ -194,40 +196,30 @@ p {
 
 .portal-card-header h3 {
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .portal-badge {
     font-size: 10px;
     font-weight: bold;
-    padding: 2px 7px;
-    border-radius: 10px;
+    padding: 1px 5px;
+    border: 1px solid #999;
+    background: linear-gradient(#f2f2f2, #d8d8d8);
     white-space: nowrap;
     flex-shrink: 0;
+    color: #000;
 }
 
-.badge-venda {
-    background: #dbeafe;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-}
-
-.badge-aluguel {
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
-}
+.badge-venda  { border-left: 3px solid #000080; color: #000080; }
+.badge-aluguel { border-left: 3px solid #006400; color: #006400; }
 
 .portal-status {
-    display: inline-block;
-    margin-top: 6px;
     font-size: 10px;
     font-weight: bold;
-    padding: 2px 7px;
-    border-radius: 10px;
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
+    color: #145a14;
+    background: #deffde;
+    border: 1px solid #2d7a2d;
+    padding: 1px 5px;
 }
 
 .home-card strong {
