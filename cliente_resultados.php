@@ -30,7 +30,7 @@ $imoveisFiltrados = array_values(array_filter($imoveis, static function ($imovel
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultado da Busca</title>
+    <title>Imboliária Ravel</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
