@@ -1,9 +1,6 @@
 <?php
 session_start();
-
-$adminEmail = 'admin@imobiliaria.local';
-$adminSenha = 'admin123';
-$adminNome = 'Administrador';
+require_once __DIR__ . '/config/conexao.php';
 
 if (!empty($_SESSION['usuario_id'])) {
     header('Location: index.php');
@@ -16,11 +13,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $senha = trim($_POST['senha'] ?? '');
 
-    if ($email === $adminEmail && $senha === $adminSenha) {
-        $_SESSION['usuario_id']   = 1;
-        $_SESSION['usuario_nome'] = $adminNome;
-        header('Location: index.php');
-        exit;
+    if ($email !== '' && $senha !== '') {
+        $conn = Conexao::getConn();
+
+        $stmt = $conn->prepare('SELECT id, nome FROM usuarios WHERE email = ? AND senha = ? LIMIT 1');
+        $stmt->execute([$email, $senha]);
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuario) {
+            $_SESSION['usuario_id']   = (int) $usuario['id'];
+            $_SESSION['usuario_nome'] = $usuario['nome'];
+            header('Location: index.php');
+            exit;
+        }
     }
 
     $erro = 'E-mail ou senha invalidos.';
@@ -49,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="post">
             <label>E-mail
-                <input type="email" name="email" required placeholder="Digite seu e-mail" value="<?= htmlspecialchars($adminEmail) ?>">
+                <input type="email" name="email" required placeholder="Digite seu e-mail">
             </label>
 
             <label>Senha
@@ -58,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button type="submit">Entrar</button>
         </form>
-        <p class="text-xs text-gray-500">Usuario fixo: <?= htmlspecialchars($adminEmail) ?></p>
         <p><a href="cliente_busca.php">Acessar portal de clientes</a></p>
         </div>
     </div>
