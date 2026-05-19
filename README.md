@@ -221,18 +221,7 @@ Acesso:
 - Login: `http://localhost:8000/login.php`
 - Painel administrativo: `http://localhost:8000/index.php`
 
-## 9) Testes
-
-Atualmente, este projeto nao possui uma suite automatizada de testes versionada no repositorio.
-
-Validacao recomendada (manual):
-- criar conta em `registro.php`
-- autenticar em `login.php`
-- executar CRUD de proprietarios, corretores, clientes e imoveis
-- agendar visita em `visita`
-- criar contrato e validar atualizacao de status do imovel
-
-## 10) Glossario
+## 9) Glossario
 
 - CRUD: Create, Read, Update, Delete.
 - MVC: Model, View, Controller.
