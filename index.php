@@ -15,6 +15,7 @@
 
 session_start();
 
+// Carrega conexao e controllers que o front controller usa.
 require_once __DIR__ . '/config/conexao.php';
 require_once __DIR__ . '/controller/ImovelController.php';
 require_once __DIR__ . '/controller/ProprietarioController.php';
@@ -23,14 +24,18 @@ require_once __DIR__ . '/controller/ClienteController.php';
 require_once __DIR__ . '/controller/ContratoController.php';
 require_once __DIR__ . '/controller/VisitaController.php';
 
+// Regra de entrada do sistema:
+// - sem sessao e acessando a raiz: abre o portal publico de imoveis
+// - sem sessao e tentando rota administrativa: vai para o login
 if (empty($_SESSION['usuario_id'])) {
-    header('Location: login.php');
+    $tentandoRotaAdmin = isset($_GET['entidade']) || isset($_GET['acao']) || $_SERVER['REQUEST_METHOD'] === 'POST';
+    header('Location: ' . ($tentandoRotaAdmin ? 'login.php' : 'cliente_busca.php'));
     exit;
 }
 
 // Pega os parâmetros da URL; se não vier nada, cai na home
-$entidade = $_GET['entidade'] ?? 'home';
-$acao     = $_GET['acao']     ?? 'listar';
+$entidade = $_GET['entidade'] ?? 'home'; // modulo que sera acessado
+$acao     = $_GET['acao']     ?? 'listar'; // operacao do modulo
 
 // Todos os controllers do sistema registrados aqui
 $controllers = [
@@ -49,6 +54,8 @@ if ($entidade !== 'home' && !isset($controllers[$entidade])) {
 }
 
 // Processa o formulário quando o método é POST
+// Fluxo padrao de gravacao:
+// formulario -> POST -> controller->salvar() -> redireciona para listagem.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $entidade !== 'home' && $acao === 'salvar') {
     try {
         $controllers[$entidade]->salvar($_POST);
@@ -66,6 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $entidade !== 'home' && $acao === '
 }
 
 // Processa a exclusão — o ID vem na URL via GET
+// Fluxo de exclusao:
+// recebe ID na URL, exclui e volta para a listagem do modulo.
 if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
     $controllers[$entidade]->excluir((int) $_GET['id']);
     header('Location: index.php?entidade=' . $entidade . '&acao=listar');
@@ -98,7 +107,7 @@ if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
         </nav>
         </div>
         <div class="user-box">
-            <a href="portal.php" target="_blank">Portal publico</a>
+            <a href="cliente_busca.php" target="_blank">Portal publico</a>
             <span>|</span>
             <span><?= htmlspecialchars((string) ($_SESSION['usuario_nome'] ?? '')) ?></span>
             <a href="logout.php">Sair</a>

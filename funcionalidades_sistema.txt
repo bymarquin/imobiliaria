@@ -1,0 +1,28 @@
+Funcionalidades do Sistema Imobiliaria
+
+- Autenticacao administrativa: login, registro de administrador e logout.
+- Protecao de sessao: acesso ao painel interno apenas para usuario logado.
+- Painel administrativo (home): visao geral com indicadores de imoveis, clientes, visitas e contratos.
+- Navegacao central por Front Controller (index.php) com entidade + acao.
+- CRUD de proprietarios: criar, listar, editar, excluir.
+- CRUD de corretores: criar, listar, editar, excluir.
+- CRUD de clientes: criar, listar, editar, excluir.
+- CRUD de imoveis: criar, listar, editar, excluir.
+- Upload de planta baixa no cadastro/edicao de imovel.
+- Filtro de imoveis por finalidade (venda/aluguel).
+- CRUD de visitas: criar, listar, editar, excluir.
+- Agendamento de visita com dados do interessado (nome, e-mail, celular, dia e horario).
+- Calculo automatico do periodo da visita (manha/tarde/noite) com base no horario.
+- Bloqueio de conflito de agenda de visita (mesmo imovel + mesmo dia + mesmo horario).
+- CRUD de contratos: criar, listar, editar, excluir.
+- Contrato vinculado a imovel, cliente e corretor.
+- Validacao de disponibilidade: bloqueia novo contrato para imovel indisponivel.
+- Atualizacao automatica do status do imovel apos salvar contrato.
+- Portal publico de clientes (portal.php) sem autenticacao:
+  - listagem de imoveis disponiveis,
+  - filtro compra/aluguel,
+  - solicitacao de agendamento de visita.
+- Persistencia com SQLite via PDO.
+- Integridade relacional com chaves estrangeiras ativas (PRAGMA foreign_keys = ON).
+- Fluxo PRG (Post/Redirect/Get) para evitar reenvio duplicado de formulario.
+- Mensagens de erro/sucesso para acoes principais de formulario.

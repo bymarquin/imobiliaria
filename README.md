@@ -12,10 +12,9 @@ Documentacao tecnica principal do sistema.
 - Tela de logout (`logout.php`) para encerramento da sessao.
 
 ### 1.2 Portal publico para clientes (sem autenticacao)
-- Tela `portal.php` para navegacao de imoveis disponiveis.
-- Filtro por finalidade (venda/aluguel) no portal.
-- Formulario publico de agendamento de visita.
-- Agendamento cria registros em `visitas` para acompanhamento administrativo.
+- Tela `cliente_busca.php` para busca de imoveis.
+- Tela `cliente_resultados.php` para exibicao dos imoveis encontrados.
+- Filtros publicos por finalidade, tipo e valor maximo.
 
 ### 1.3 Roteamento centralizado
 - Todas as acoes principais passam por `index.php`.
@@ -77,10 +76,10 @@ Documentacao tecnica principal do sistema.
   - indicadores gerais (totais por entidade)
 
 ### 2.4 Portal publico de clientes
-- Arquivo: `portal.php`
-- Objetivo: permitir consulta de imoveis e solicitacao de visita sem login.
-- Entradas: filtros de finalidade e dados de contato para agendamento.
-- Saida esperada: visita registrada e retorno de confirmacao.
+- Arquivos: `cliente_busca.php` e `cliente_resultados.php`
+- Objetivo: permitir busca de imoveis sem login.
+- Entradas: filtros de finalidade, tipo e valor maximo.
+- Saida esperada: listagem de imoveis disponiveis conforme filtros.
 
 ### 2.5 Formulario de proprietario
 - Arquivo: `view/proprietario/form.php`
@@ -216,7 +215,9 @@ php -S localhost:8000
 ```
 
 Acesso:
-- Portal de clientes: `http://localhost:8000/portal.php`
+- Entrada principal: `http://localhost:8000/index.php` (redireciona para a busca publica quando nao autenticado)
+- Busca de clientes: `http://localhost:8000/cliente_busca.php`
+- Resultado da busca: `http://localhost:8000/cliente_resultados.php`
 - Registro: `http://localhost:8000/registro.php`
 - Login: `http://localhost:8000/login.php`
 - Painel administrativo: `http://localhost:8000/index.php`

@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Entrar</button>
         </form>
         <p><a href="registro.php">Criar conta de administrador</a></p>
-        <p><a href="portal.php">Acessar portal de clientes</a></p>
+        <p><a href="cliente_busca.php">Acessar portal de clientes</a></p>
         </div>
     </div>
 

@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit">Registrar</button>
             </form>
             <p><a href="login.php">Voltar para login</a></p>
-            <p><a href="portal.php">Ir para portal de clientes</a></p>
+            <p><a href="cliente_busca.php">Ir para portal de clientes</a></p>
         </div>
     </div>
 
