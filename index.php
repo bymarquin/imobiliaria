@@ -52,6 +52,16 @@ if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
     header('Location: index.php?entidade=' . $entidade . '&acao=listar');
     exit;
 }
+
+if ($entidade === 'contrato' && $acao === 'encerrar' && isset($_GET['id'])) {
+    try {
+        $controllers['contrato']->encerrar((int) $_GET['id']);
+    } catch (RuntimeException $e) {
+        $_SESSION['form_erro'] = $e->getMessage();
+    }
+    header('Location: index.php?entidade=contrato&acao=listar');
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -303,39 +313,52 @@ if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
             </table>
 
         <?php elseif ($entidade === 'contrato'): ?>
+            <?php
+            $erroContrato = $_SESSION['form_erro'] ?? '';
+            unset($_SESSION['form_erro']);
+            if ($erroContrato): ?>
+                <div class="login-erro"><?= htmlspecialchars($erroContrato) ?></div>
+            <?php endif; ?>
             <table class="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
                 <tr class="hover:bg-gray-50">
-                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">ID</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Imovel</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Cliente</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Corretor</th>
-                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Tipo</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Valor</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Inicio</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Fim</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Planta</th><th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Acoes</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">ID</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Imovel</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Cliente</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Corretor</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Tipo</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Valor</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Inicio</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Fim</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Status</th>
+                    <th class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-2.5 text-left border-b border-gray-200">Acoes</th>
                 </tr>
                 <?php foreach ($itens as $r): ?>
+                <?php
+                $statusClasses = [
+                    'ativo'     => 'text-green-700 bg-green-50 border-green-200',
+                    'encerrado' => 'text-gray-500 bg-gray-100 border-gray-200',
+                    'cancelado' => 'text-red-600 bg-red-50 border-red-200',
+                ];
+                $statusClass = $statusClasses[$r->getStatus()] ?? 'text-gray-500';
+                ?>
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getId() ?></td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getImovelTitulo()) ?></td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getClienteNome()) ?></td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getCorretorNome()) ?></td>
-                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getTipo()) ?></td>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= ucfirst(htmlspecialchars($r->getTipo())) ?></td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100">R$ <?= number_format($r->getValor(), 2, ',', '.') ?></td>
                     <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars($r->getDataInicio()) ?></td>
-                    <!-- Contrato de venda pode não ter data fim — mostra vazio quando null -->
-                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= htmlspecialchars((string) $r->getDataFim()) ?></td>
-                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
-                        <?php if ($r->getImovelPlantaBaixa()): ?>
-                            <?php
-                            $plantaContrato = basename((string) $r->getImovelPlantaBaixa());
-                            $plantaContratoCaminho = __DIR__ . '/uploads/' . $plantaContrato;
-                            ?>
-                            <?php if (is_file($plantaContratoCaminho)): ?>
-                                <a class="text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100" href="uploads/<?= rawurlencode($plantaContrato) ?>" target="_blank">Ver planta</a>
-                            <?php else: ?>
-                                <span class="text-xs text-red-500">arquivo nao encontrado</span>
-                            <?php endif; ?>
-                        <?php else: ?>
-                            —
-                        <?php endif; ?>
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100"><?= $r->getDataFim() ? htmlspecialchars($r->getDataFim()) : '—' ?></td>
+                    <td class="px-4 py-3 border-b border-gray-100">
+                        <span class="text-xs font-medium px-2 py-0.5 rounded border <?= $statusClass ?>"><?= ucfirst($r->getStatus()) ?></span>
                     </td>
-                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100">
+                    <td class="px-4 py-3 text-gray-700 border-b border-gray-100 flex gap-1 flex-wrap">
                         <a class="text-xs text-gray-500 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-gray-100 transition" href="index.php?entidade=contrato&acao=editar&id=<?= $r->getId() ?>">Editar</a>
+                        <?php if ($r->getStatus() === 'ativo'): ?>
+                        <a class="text-xs text-amber-600 hover:text-amber-800 px-2 py-0.5 rounded hover:bg-amber-50 transition" href="index.php?entidade=contrato&acao=encerrar&id=<?= $r->getId() ?>"
+                           onclick="return confirm('Encerrar este contrato? Para aluguel, o imovel voltara a ficar disponivel.')">Encerrar</a>
+                        <?php endif; ?>
                         <a class="text-xs text-red-500 hover:text-red-700 px-2 py-0.5 rounded hover:bg-red-50 transition" href="index.php?entidade=contrato&acao=excluir&id=<?= $r->getId() ?>"
                            onclick="return confirm('Excluir registro?')">Excluir</a>
                     </td>

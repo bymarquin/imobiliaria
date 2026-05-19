@@ -112,6 +112,52 @@ p {
     padding: 9px;
 }
 
+.portal-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.portal-card-header h3 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.portal-badge {
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.badge-venda {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.badge-aluguel {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.portal-status {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
 .home-card strong {
     display: block;
     margin-bottom: 5px;

@@ -54,13 +54,20 @@ $imoveisFiltrados = array_values(array_filter($imoveis, static function ($imovel
 
     <div class="portal-grid">
         <?php foreach ($imoveisFiltrados as $imovel): ?>
+        <?php
+        $finalidadeLabel = $imovel->getFinalidade() === 'venda' ? 'Comprar' : 'Alugar';
+        $finalidadeClass = $imovel->getFinalidade() === 'venda' ? 'badge-venda' : 'badge-aluguel';
+        ?>
             <article class="portal-card">
-                <h3><?= htmlspecialchars($imovel->getTitulo()) ?></h3>
+                <div class="portal-card-header">
+                    <h3><?= htmlspecialchars($imovel->getTitulo()) ?></h3>
+                    <span class="portal-badge <?= $finalidadeClass ?>"><?= $finalidadeLabel ?></span>
+                </div>
                 <p><strong>Tipo:</strong> <?= htmlspecialchars(ucfirst($imovel->getTipo())) ?></p>
                 <p><strong>Endereco:</strong> <?= htmlspecialchars($imovel->getEndereco()) ?></p>
-                <p><strong>Finalidade:</strong> <?= htmlspecialchars(ucfirst($imovel->getFinalidade())) ?></p>
                 <p><strong>Valor:</strong> R$ <?= number_format($imovel->getValor(), 2, ',', '.') ?></p>
-                <p><strong>Area:</strong> <?= $imovel->getMetrosQuadrados() ? number_format($imovel->getMetrosQuadrados(), 0, ',', '.') . ' m2' : 'Nao informado' ?></p>
+                <p><strong>Area:</strong> <?= $imovel->getMetrosQuadrados() ? number_format($imovel->getMetrosQuadrados(), 0, ',', '.') . ' m²' : 'Nao informado' ?></p>
+                <span class="portal-status">Disponivel</span>
             </article>
         <?php endforeach; ?>
     </div>
