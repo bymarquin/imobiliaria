@@ -293,11 +293,19 @@ if ($entidade === 'contrato' && $acao === 'encerrar' && isset($_GET['id'])) {
                             <?php
                             $plantaArquivo = basename((string) $r->getPlantaBaixa());
                             $plantaCaminho = __DIR__ . '/uploads/' . $plantaArquivo;
+                            $plantaUrl     = 'uploads/' . rawurlencode($plantaArquivo);
+                            $isPdf         = strtolower(pathinfo($plantaArquivo, PATHINFO_EXTENSION)) === 'pdf';
                             ?>
                             <?php if (is_file($plantaCaminho)): ?>
-                                <a class="text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100" href="uploads/<?= rawurlencode($plantaArquivo) ?>" target="_blank">Ver planta</a>
+                                <?php if (!$isPdf): ?>
+                                    <a href="<?= $plantaUrl ?>" target="_blank">
+                                        <img src="<?= $plantaUrl ?>" alt="Planta" style="width:60px;height:60px;object-fit:cover;border:1px solid #999;display:block;">
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?= $plantaUrl ?>" target="_blank">Ver PDF</a>
+                                <?php endif; ?>
                             <?php else: ?>
-                                <span class="text-xs text-red-500">arquivo nao encontrado</span>
+                                <span style="color:red;font-size:11px;">nao encontrado</span>
                             <?php endif; ?>
                         <?php else: ?>
                             —
