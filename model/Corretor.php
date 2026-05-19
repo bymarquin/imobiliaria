@@ -1,22 +1,19 @@
 <?php
 
-// Representa um corretor de imóveis.
 class Corretor
 {
     private ?int $id = null;
     private string $nome = '';
-    private string $creci = ''; // número de registro profissional do corretor
+    private string $creci = '';
     private string $telefone = '';
     private string $email = '';
 
-    // Getters: retornam os dados do objeto
     public function getId(): ?int         { return $this->id; }
     public function getNome(): string     { return $this->nome; }
     public function getCreci(): string    { return $this->creci; }
     public function getTelefone(): string { return $this->telefone; }
     public function getEmail(): string    { return $this->email; }
 
-    // Setters: gravam dados no objeto
     public function setId(?int $id): void          { $this->id = $id; }
     public function setNome(string $nome): void    { $this->nome = $nome; }
     public function setCreci(string $creci): void  { $this->creci = $creci; }

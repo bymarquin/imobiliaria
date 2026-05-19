@@ -1,15 +1,7 @@
 <?php
-/**
- * Formulário de agendamento de visita a um imóvel.
- *
- * O visitante escolhe qual imóvel quer conhecer, informa seus dados de contato
- * e seleciona o dia da semana e o horário de preferência. O corretor usa isso
- * pra entrar em contato e confirmar o horário exato.
- */
 
 $editando = $visita && $visita->getId();
 
-// Nomes legíveis pra exibir nos selects
 $diasSemana = [
     'segunda' => 'Segunda-feira',
     'terca'   => 'Terça-feira',

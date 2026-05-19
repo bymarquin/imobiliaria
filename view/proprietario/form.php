@@ -1,11 +1,4 @@
 <?php
-/**
- * Formulário de cadastro e edição de proprietários.
- *
- * Funciona igual aos outros formulários do sistema: o $proprietario recebido
- * do controller pode ser null (novo cadastro) ou ter dados (edição).
- * O campo hidden "id" é enviado apenas na edição para identificar o registro.
- */
 
 $editando = $proprietario && $proprietario->getId();
 ?>

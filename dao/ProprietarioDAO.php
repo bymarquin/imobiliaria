@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../config/conexao.php';
 require_once __DIR__ . '/../model/Proprietario.php';
 
-// Responsável por todas as operações de banco de dados relacionadas a proprietários.
 class ProprietarioDAO
 {
     private PDO $conn;
@@ -12,7 +11,6 @@ class ProprietarioDAO
         $this->conn = Conexao::getConn();
     }
 
-    // Retorna todos os proprietários
     public function listar(): array
     {
         $stmt = $this->conn->query('SELECT * FROM proprietarios ORDER BY id DESC');
@@ -23,7 +21,6 @@ class ProprietarioDAO
         return $result;
     }
 
-    // Busca um proprietário pelo ID; retorna null se não encontrar
     public function buscarPorId(int $id): ?Proprietario
     {
         $stmt = $this->conn->prepare('SELECT * FROM proprietarios WHERE id = ?');
@@ -32,7 +29,6 @@ class ProprietarioDAO
         return $row ? $this->toModel($row) : null;
     }
 
-    // Salva o proprietário: se tiver ID atualiza, se não tiver cria novo
     public function salvar(Proprietario $proprietario): void
     {
         if ($proprietario->getId()) {
@@ -59,14 +55,12 @@ class ProprietarioDAO
         }
     }
 
-    // Remove o proprietário do banco pelo ID
     public function excluir(int $id): void
     {
         $stmt = $this->conn->prepare('DELETE FROM proprietarios WHERE id = ?');
         $stmt->execute([$id]);
     }
 
-    // Converte uma linha do banco em um objeto Proprietario
     private function toModel(array $row): Proprietario
     {
         $proprietario = new Proprietario();

@@ -4,8 +4,6 @@ require_once __DIR__ . '/../dao/ImovelDAO.php';
 require_once __DIR__ . '/../dao/ClienteDAO.php';
 require_once __DIR__ . '/../dao/CorretorDAO.php';
 
-// Recebe os dados do formulário, organiza e repassa pro DAO salvar ou buscar.
-// Usa três DAOs extras só pra preencher os selects do formulário.
 class ContratoController
 {
     private ContratoDAO $dao;
@@ -21,24 +19,20 @@ class ContratoController
         $this->corretorDAO = new CorretorDAO();
     }
 
-    // Retorna todos os contratos com nomes do imóvel, cliente e corretor
     public function listar(): array
     {
         return $this->dao->listar();
     }
 
-    // Busca um contrato pelo ID pra preencher o formulário de edição
     public function buscarPorId(int $id): ?Contrato
     {
         return $this->dao->buscarPorId($id);
     }
 
-    // Os três métodos abaixo preenchem os selects no formulário de contrato
     public function listarImoveis(): array    { return $this->imovelDAO->listar(); }
     public function listarClientes(): array   { return $this->clienteDAO->listar(); }
     public function listarCorretores(): array { return $this->corretorDAO->listar(); }
 
-    // Recebe os dados do formulário e salva o contrato
     public function salvar(array $data): void
     {
         $idContrato = !empty($data['id']) ? (int) $data['id'] : 0;
@@ -54,23 +48,51 @@ class ContratoController
             throw new RuntimeException('Este imovel nao esta disponivel para novo contrato.');
         }
 
+        if ($tipo === 'aluguel' && empty($data['data_fim'])) {
+            throw new RuntimeException('Contratos de aluguel exigem uma data de fim.');
+        }
+
+        if ($tipo === 'aluguel' && $imovel->getFinalidade() !== 'aluguel') {
+            throw new RuntimeException('Este imovel nao esta disponivel para aluguel.');
+        }
+
+        if ($tipo === 'venda' && $imovel->getFinalidade() !== 'venda') {
+            throw new RuntimeException('Este imovel nao esta disponivel para venda.');
+        }
+
         $contrato = new Contrato();
-        if ($idContrato > 0) $contrato->setId($idContrato); // se tem ID é edição
+        if ($idContrato > 0) $contrato->setId($idContrato);
         $contrato->setIdImovel($idImovel);
         $contrato->setIdCliente((int) ($data['id_cliente'] ?? 0));
         $contrato->setIdCorretor((int) ($data['id_corretor'] ?? 0));
         $contrato->setTipo($tipo);
         $contrato->setValor((float) ($data['valor'] ?? 0));
         $contrato->setDataInicio($data['data_inicio'] ?? '');
-        $contrato->setDataFim(!empty($data['data_fim']) ? $data['data_fim'] : null); // data_fim é opcional
+        $contrato->setDataFim(!empty($data['data_fim']) ? $data['data_fim'] : null);
+        $contrato->setStatus('ativo');
         $this->dao->salvar($contrato);
 
-        // Contrato fechado deve refletir no status operacional do imóvel.
         $novoStatus = $tipo === 'aluguel' ? 'alugado' : 'vendido';
         $this->imovelDAO->atualizarStatus($idImovel, $novoStatus);
     }
 
-    // Remove o contrato pelo ID
+    public function encerrar(int $id): void
+    {
+        $contrato = $this->dao->buscarPorId($id);
+        if (!$contrato) {
+            throw new RuntimeException('Contrato nao encontrado.');
+        }
+        if ($contrato->getStatus() !== 'ativo') {
+            throw new RuntimeException('Este contrato ja esta encerrado.');
+        }
+
+        $this->dao->encerrar($id);
+
+        if ($contrato->getTipo() === 'aluguel') {
+            $this->imovelDAO->atualizarStatus($contrato->getIdImovel(), 'disponivel');
+        }
+    }
+
     public function excluir(int $id): void
     {
         $this->dao->excluir($id);

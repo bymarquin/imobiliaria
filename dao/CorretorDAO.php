@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../config/conexao.php';
 require_once __DIR__ . '/../model/Corretor.php';
 
-// Responsável por todas as operações de banco de dados relacionadas a corretores.
 class CorretorDAO
 {
     private PDO $conn;
@@ -12,7 +11,6 @@ class CorretorDAO
         $this->conn = Conexao::getConn();
     }
 
-    // Retorna todos os corretores
     public function listar(): array
     {
         $stmt = $this->conn->query('SELECT * FROM corretores ORDER BY id DESC');
@@ -23,7 +21,6 @@ class CorretorDAO
         return $result;
     }
 
-    // Busca um corretor pelo ID; retorna null se não encontrar
     public function buscarPorId(int $id): ?Corretor
     {
         $stmt = $this->conn->prepare('SELECT * FROM corretores WHERE id = ?');
@@ -32,7 +29,6 @@ class CorretorDAO
         return $row ? $this->toModel($row) : null;
     }
 
-    // Salva o corretor: se tiver ID atualiza, se não tiver cria novo
     public function salvar(Corretor $corretor): void
     {
         if ($corretor->getId()) {
@@ -59,14 +55,12 @@ class CorretorDAO
         }
     }
 
-    // Remove o corretor do banco pelo ID
     public function excluir(int $id): void
     {
         $stmt = $this->conn->prepare('DELETE FROM corretores WHERE id = ?');
         $stmt->execute([$id]);
     }
 
-    // Converte uma linha do banco em um objeto Corretor
     private function toModel(array $row): Corretor
     {
         $corretor = new Corretor();

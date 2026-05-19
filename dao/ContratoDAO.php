@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../config/conexao.php';
 require_once __DIR__ . '/../model/Contrato.php';
 
-// Responsável por todas as operações de banco de dados relacionadas a contratos.
 class ContratoDAO
 {
     private PDO $conn;
@@ -12,11 +11,9 @@ class ContratoDAO
         $this->conn = Conexao::getConn();
     }
 
-    // Retorna todos os contratos com os nomes do imóvel, cliente e corretor incluídos.
-    // Usa três JOINs pra trazer os nomes — sem isso teria só os IDs.
     public function listar(): array
     {
-        $sql = 'SELECT c.*, i.titulo AS imovel_titulo, cl.nome AS cliente_nome, co.nome AS corretor_nome
+        $sql = 'SELECT c.*, i.titulo AS imovel_titulo, i.planta_baixa AS imovel_planta_baixa, i.finalidade AS imovel_finalidade, cl.nome AS cliente_nome, co.nome AS corretor_nome
                 FROM contratos c
                 JOIN imoveis i     ON i.id  = c.id_imovel
                 JOIN clientes cl   ON cl.id = c.id_cliente
@@ -30,7 +27,6 @@ class ContratoDAO
         return $result;
     }
 
-    // Busca um contrato pelo ID; retorna null se não encontrar
     public function buscarPorId(int $id): ?Contrato
     {
         $stmt = $this->conn->prepare('SELECT * FROM contratos WHERE id = ?');
@@ -39,12 +35,11 @@ class ContratoDAO
         return $row ? $this->toModel($row) : null;
     }
 
-    // Salva o contrato: se tiver ID atualiza, se não tiver cria novo
     public function salvar(Contrato $contrato): void
     {
         if ($contrato->getId()) {
             $stmt = $this->conn->prepare(
-                'UPDATE contratos SET id_imovel = ?, id_cliente = ?, id_corretor = ?, tipo = ?, valor = ?, data_inicio = ?, data_fim = ? WHERE id = ?'
+                'UPDATE contratos SET id_imovel = ?, id_cliente = ?, id_corretor = ?, tipo = ?, valor = ?, data_inicio = ?, data_fim = ?, status = ? WHERE id = ?'
             );
             $stmt->execute([
                 $contrato->getIdImovel(),
@@ -54,11 +49,12 @@ class ContratoDAO
                 $contrato->getValor(),
                 $contrato->getDataInicio(),
                 $contrato->getDataFim(),
+                $contrato->getStatus(),
                 $contrato->getId(),
             ]);
         } else {
             $stmt = $this->conn->prepare(
-                'INSERT INTO contratos (id_imovel, id_cliente, id_corretor, tipo, valor, data_inicio, data_fim) VALUES (?, ?, ?, ?, ?, ?, ?)'
+                'INSERT INTO contratos (id_imovel, id_cliente, id_corretor, tipo, valor, data_inicio, data_fim, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
             );
             $stmt->execute([
                 $contrato->getIdImovel(),
@@ -68,19 +64,23 @@ class ContratoDAO
                 $contrato->getValor(),
                 $contrato->getDataInicio(),
                 $contrato->getDataFim(),
+                $contrato->getStatus(),
             ]);
         }
     }
 
-    // Remove o contrato do banco pelo ID
+    public function encerrar(int $id): void
+    {
+        $stmt = $this->conn->prepare("UPDATE contratos SET status = 'encerrado' WHERE id = ?");
+        $stmt->execute([$id]);
+    }
+
     public function excluir(int $id): void
     {
         $stmt = $this->conn->prepare('DELETE FROM contratos WHERE id = ?');
         $stmt->execute([$id]);
     }
 
-    // Converte uma linha do banco em um objeto Contrato.
-    // imovel_titulo, cliente_nome e corretor_nome só existem quando a query usou JOINs
     private function toModel(array $row): Contrato
     {
         $contrato = new Contrato();
@@ -92,8 +92,10 @@ class ContratoDAO
         $contrato->setValor((float) $row['valor']);
         $contrato->setDataInicio($row['data_inicio']);
         $contrato->setDataFim($row['data_fim'] ?? null);
+        $contrato->setStatus($row['status'] ?? 'ativo');
         if (isset($row['imovel_titulo'])) {
             $contrato->setImovelTitulo($row['imovel_titulo']);
+            $contrato->setImovelPlantaBaixa($row['imovel_planta_baixa'] ?? null);
             $contrato->setClienteNome($row['cliente_nome']);
             $contrato->setCorretorNome($row['corretor_nome']);
         }

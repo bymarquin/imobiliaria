@@ -1,6 +1,6 @@
 <?php
 session_start();
-$_SESSION = [];    // apaga os dados do usuário logado
-session_destroy(); // encerra a sessão
+$_SESSION = [];
+session_destroy();
 header('Location: login.php');
 exit;

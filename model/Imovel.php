@@ -1,23 +1,19 @@
 <?php
 
-// Representa um imóvel cadastrado no sistema.
-// O campo nome_proprietario não vem da tabela de imóveis —
-// ele é preenchido via JOIN no DAO só pra mostrar o nome na tela.
 class Imovel
 {
     private ?int $id = null;
     private string $titulo = '';
-    private string $tipo = '';            // casa, apartamento, terreno, comercial
+    private string $tipo = '';
     private string $endereco = '';
     private float $valor = 0.0;
-    private string $status = '';          // disponivel, alugado, vendido
-    private string $finalidade = '';      // venda ou aluguel
+    private string $status = '';
+    private string $finalidade = '';
     private ?float $metros_quadrados = null;
-    private ?string $planta_baixa = null; // nome do arquivo salvo na pasta uploads/
+    private ?string $planta_baixa = null;
     private int $id_proprietario = 0;
-    private string $nome_proprietario = ''; // vem do JOIN — só pra exibição
+    private string $nome_proprietario = '';
 
-    // Getters: retornam os dados do objeto
     public function getId(): ?int                 { return $this->id; }
     public function getTitulo(): string           { return $this->titulo; }
     public function getTipo(): string             { return $this->tipo; }
@@ -30,7 +26,6 @@ class Imovel
     public function getIdProprietario(): int      { return $this->id_proprietario; }
     public function getNomeProprietario(): string { return $this->nome_proprietario; }
 
-    // Setters: gravam dados no objeto
     public function setId(?int $id): void                   { $this->id = $id; }
     public function setTitulo(string $titulo): void         { $this->titulo = $titulo; }
     public function setTipo(string $tipo): void             { $this->tipo = $tipo; }

@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../config/conexao.php';
 require_once __DIR__ . '/../model/Cliente.php';
 
-// Responsável por todas as operações de banco de dados relacionadas a clientes.
 class ClienteDAO
 {
     private PDO $conn;
@@ -12,7 +11,6 @@ class ClienteDAO
         $this->conn = Conexao::getConn();
     }
 
-    // Retorna todos os clientes
     public function listar(): array
     {
         $stmt = $this->conn->query('SELECT * FROM clientes ORDER BY id DESC');
@@ -23,7 +21,6 @@ class ClienteDAO
         return $result;
     }
 
-    // Busca um cliente pelo ID; retorna null se não encontrar
     public function buscarPorId(int $id): ?Cliente
     {
         $stmt = $this->conn->prepare('SELECT * FROM clientes WHERE id = ?');
@@ -32,7 +29,6 @@ class ClienteDAO
         return $row ? $this->toModel($row) : null;
     }
 
-    // Salva o cliente: se tiver ID atualiza, se não tiver cria novo
     public function salvar(Cliente $cliente): void
     {
         if ($cliente->getId()) {
@@ -61,14 +57,12 @@ class ClienteDAO
         }
     }
 
-    // Remove o cliente do banco pelo ID
     public function excluir(int $id): void
     {
         $stmt = $this->conn->prepare('DELETE FROM clientes WHERE id = ?');
         $stmt->execute([$id]);
     }
 
-    // Converte uma linha do banco em um objeto Cliente
     private function toModel(array $row): Cliente
     {
         $cliente = new Cliente();

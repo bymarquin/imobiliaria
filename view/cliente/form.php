@@ -1,12 +1,4 @@
 <?php
-/**
- * Formulario de cadastro e edicao de clientes.
- *
- * Segue o mesmo padrao visual e de comportamento dos demais formularios:
- * - id oculto apenas em edicao
- * - nomes de campos alinhados ao controller/DAO
- * - persistencia dos valores no formulario durante edicao
- */
 
 $editando = $cliente && $cliente->getId();
 ?>

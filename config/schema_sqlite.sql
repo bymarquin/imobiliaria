@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS contratos (
     valor NUMERIC NOT NULL,
     data_inicio TEXT NOT NULL,
     data_fim TEXT,
+    status TEXT NOT NULL DEFAULT 'ativo' CHECK (status IN ('ativo', 'encerrado', 'cancelado')),
     FOREIGN KEY (id_imovel) REFERENCES imoveis(id),
     FOREIGN KEY (id_cliente) REFERENCES clientes(id),
     FOREIGN KEY (id_corretor) REFERENCES corretores(id)

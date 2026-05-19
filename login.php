@@ -2,7 +2,6 @@
 session_start();
 require_once __DIR__ . '/config/conexao.php';
 
-// Se já está logado, vai direto pra home
 if (!empty($_SESSION['usuario_id'])) {
     header('Location: index.php');
     exit;
@@ -17,13 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email !== '' && $senha !== '') {
         $conn = Conexao::getConn();
 
-        // Busca o usuário no banco pelo e-mail e senha
         $stmt = $conn->prepare('SELECT id, nome FROM usuarios WHERE email = ? AND senha = ? LIMIT 1');
         $stmt->execute([$email, $senha]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($usuario) {
-            // Login correto: salva o usuário na sessão e redireciona
             $_SESSION['usuario_id']   = (int) $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['nome'];
             header('Location: index.php');

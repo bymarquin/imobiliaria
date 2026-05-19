@@ -1,13 +1,4 @@
 <?php
-/**
- * Formulário de cadastro e edição de imóveis.
- *
- * O enctype="multipart/form-data" é obrigatório quando tem upload de arquivo —
- * sem ele, o PHP não recebe o $_FILES e a planta baixa nunca chega ao servidor.
- *
- * O campo oculto "planta_baixa_atual" preserva o arquivo já salvo quando o
- * usuário edita o imóvel sem querer trocar a planta baixa.
- */
 
 $editando = $imovel && $imovel->getId();
 ?>
@@ -86,8 +77,15 @@ $editando = $imovel && $imovel->getId();
 
     <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Planta Baixa
         <?php if ($editando && $imovel->getPlantaBaixa()): ?>
-            <!-- Mostra a planta atual durante a edição -->
-            <p class="text-xs text-gray-400 normal-case tracking-normal">Planta atual: <a href="uploads/<?= htmlspecialchars($imovel->getPlantaBaixa()) ?>" target="_blank" class="text-teal-600 underline">ver planta</a></p>
+            <?php
+            $plantaAtual = basename((string) $imovel->getPlantaBaixa());
+            $plantaAtualCaminho = __DIR__ . '/../../uploads/' . $plantaAtual;
+            ?>
+            <?php if (is_file($plantaAtualCaminho)): ?>
+                <p class="text-xs text-gray-400 normal-case tracking-normal">Planta atual: <a href="uploads/<?= rawurlencode($plantaAtual) ?>" target="_blank" class="text-teal-600 underline">ver planta</a></p>
+            <?php else: ?>
+                <p class="text-xs text-red-500 normal-case tracking-normal">Planta atual nao encontrada em uploads.</p>
+            <?php endif; ?>
             <p class="text-xs text-gray-400 normal-case tracking-normal">Enviar nova planta (opcional — substitui a atual):</p>
         <?php endif; ?>
         <input type="file" name="planta_baixa" accept="image/*,.pdf" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">

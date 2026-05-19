@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../config/conexao.php';
 require_once __DIR__ . '/../model/Imovel.php';
 
-// Responsável por todas as operações de banco de dados relacionadas a imóveis.
 class ImovelDAO
 {
     private PDO $conn;
@@ -12,22 +11,21 @@ class ImovelDAO
         $this->conn = Conexao::getConn();
     }
 
-    // Retorna todos os imóveis com o nome do proprietário incluído.
-    // Aceita um filtro opcional de finalidade ("venda" ou "aluguel").
     public function listar(string $finalidade = ''): array
     {
-        // JOIN com proprietarios pra trazer o nome do dono junto
         $sql = 'SELECT i.*, p.nome AS nome_proprietario
                 FROM imoveis i
                 JOIN proprietarios p ON p.id = i.id_proprietario';
 
-        // Só adiciona o filtro se for um valor válido
+        $params = [];
         if ($finalidade === 'venda' || $finalidade === 'aluguel') {
-            $sql .= " WHERE i.finalidade = '$finalidade'";
+            $sql .= ' WHERE i.finalidade = ?';
+            $params[] = $finalidade;
         }
 
         $sql .= ' ORDER BY i.id DESC';
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
         $result = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $result[] = $this->toModel($row);
@@ -35,7 +33,6 @@ class ImovelDAO
         return $result;
     }
 
-    // Busca um imóvel pelo ID; retorna null se não encontrar
     public function buscarPorId(int $id): ?Imovel
     {
         $stmt = $this->conn->prepare('SELECT * FROM imoveis WHERE id = ?');
@@ -44,7 +41,6 @@ class ImovelDAO
         return $row ? $this->toModel($row) : null;
     }
 
-    // Salva o imóvel: se tiver ID atualiza, se não tiver cria novo
     public function salvar(Imovel $imovel): void
     {
         if ($imovel->getId()) {
@@ -81,7 +77,6 @@ class ImovelDAO
         }
     }
 
-    // Remove o imóvel do banco pelo ID
     public function excluir(int $id): void
     {
         $stmt = $this->conn->prepare('DELETE FROM imoveis WHERE id = ?');
@@ -94,8 +89,6 @@ class ImovelDAO
         $stmt->execute([$status, $id]);
     }
 
-    // Converte uma linha do banco em um objeto Imovel.
-    // nome_proprietario só existe quando a query usou JOIN — por isso o isset()
     private function toModel(array $row): Imovel
     {
         $imovel = new Imovel();

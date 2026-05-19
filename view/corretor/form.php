@@ -1,10 +1,4 @@
 <?php
-/**
- * Formulário de cadastro e edição de corretores.
- *
- * O campo CRECI é obrigatório porque é o registro profissional do corretor —
- * sem ele, o profissional não pode legalmente intermediar negociações.
- */
 
 $editando = $corretor && $corretor->getId();
 ?>
