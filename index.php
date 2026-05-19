@@ -68,7 +68,7 @@ if ($entidade === 'contrato' && $acao === 'encerrar' && isset($_GET['id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imobiliária</title>
+    <title>Imboliária Ravel</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -292,20 +292,15 @@ if ($entidade === 'contrato' && $acao === 'encerrar' && isset($_GET['id'])) {
                         <?php if ($r->getPlantaBaixa()): ?>
                             <?php
                             $plantaArquivo = basename((string) $r->getPlantaBaixa());
-                            $plantaCaminho = __DIR__ . '/uploads/' . $plantaArquivo;
                             $plantaUrl     = 'uploads/' . rawurlencode($plantaArquivo);
                             $isPdf         = strtolower(pathinfo($plantaArquivo, PATHINFO_EXTENSION)) === 'pdf';
                             ?>
-                            <?php if (is_file($plantaCaminho)): ?>
-                                <?php if (!$isPdf): ?>
-                                    <a href="<?= $plantaUrl ?>" target="_blank">
-                                        <img src="<?= $plantaUrl ?>" alt="Planta" style="width:60px;height:60px;object-fit:cover;border:1px solid #999;display:block;">
-                                    </a>
-                                <?php else: ?>
-                                    <a href="<?= $plantaUrl ?>" target="_blank">Ver PDF</a>
-                                <?php endif; ?>
+                            <?php if (!$isPdf): ?>
+                                <a href="<?= $plantaUrl ?>" target="_blank">
+                                    <img src="<?= $plantaUrl ?>" alt="Planta" style="width:60px;height:60px;object-fit:cover;border:1px solid #999;display:block;">
+                                </a>
                             <?php else: ?>
-                                <span style="color:red;font-size:11px;">nao encontrado</span>
+                                <a href="<?= $plantaUrl ?>" target="_blank">Ver PDF</a>
                             <?php endif; ?>
                         <?php else: ?>
                             —
