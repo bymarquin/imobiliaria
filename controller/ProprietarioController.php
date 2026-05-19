@@ -1,12 +1,7 @@
 <?php
 require_once __DIR__ . '/../dao/ProprietarioDAO.php';
 
-/**
- * Intermediário entre o formulário de proprietários e o banco de dados.
- *
- * Recebe os dados da View, monta o objeto Proprietario e delega pro DAO
- * salvar ou buscar. Mesma responsabilidade dos outros controllers.
- */
+// Recebe os dados do formulário, organiza e repassa pro DAO salvar ou buscar.
 class ProprietarioController
 {
     private ProprietarioDAO $dao;
@@ -16,29 +11,23 @@ class ProprietarioController
         $this->dao = new ProprietarioDAO();
     }
 
-    /**
-     * Retorna todos os proprietários pra listagem.
-     */
+    // Retorna todos os proprietários
     public function listar(): array
     {
         return $this->dao->listar();
     }
 
-    /**
-     * Busca um proprietário pelo ID pra pré-preencher o formulário de edição.
-     */
+    // Busca um proprietário pelo ID pra preencher o formulário de edição
     public function buscarPorId(int $id): ?Proprietario
     {
         return $this->dao->buscarPorId($id);
     }
 
-    /**
-     * Recebe os dados do formulário, monta o objeto Proprietario e salva.
-     */
+    // Recebe os dados do formulário e salva o proprietário
     public function salvar(array $data): void
     {
         $proprietario = new Proprietario();
-        if (!empty($data['id'])) $proprietario->setId((int) $data['id']);
+        if (!empty($data['id'])) $proprietario->setId((int) $data['id']); // se tem ID é edição
         $proprietario->setNome(trim($data['nome'] ?? ''));
         $proprietario->setCpf(trim($data['cpf'] ?? ''));
         $proprietario->setTelefone(trim($data['telefone'] ?? ''));
@@ -46,9 +35,7 @@ class ProprietarioController
         $this->dao->salvar($proprietario);
     }
 
-    /**
-     * Remove o proprietário com o ID informado.
-     */
+    // Remove o proprietário pelo ID
     public function excluir(int $id): void
     {
         $this->dao->excluir($id);

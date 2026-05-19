@@ -2,13 +2,7 @@
 require_once __DIR__ . '/../config/conexao.php';
 require_once __DIR__ . '/../model/Contrato.php';
 
-/**
- * Cuida de tudo que envolve contratos no banco de dados.
- *
- * O contrato é a entidade mais relacional do sistema — ele cruza três tabelas:
- * imoveis, clientes e corretores. A query de listagem usa três JOINs pra já
- * trazer os nomes de cada parte, porque mostrar só IDs na tela não serve pra ninguém.
- */
+// Responsável por todas as operações de banco de dados relacionadas a contratos.
 class ContratoDAO
 {
     private PDO $conn;
@@ -18,18 +12,14 @@ class ContratoDAO
         $this->conn = Conexao::getConn();
     }
 
-    /**
-     * Retorna todos os contratos com os nomes do imóvel, cliente e corretor.
-     *
-     * São três JOINs porque o contrato sozinho só tem IDs — pra mostrar nomes
-     * na listagem, a gente precisa buscar cada entidade relacionada.
-     */
+    // Retorna todos os contratos com os nomes do imóvel, cliente e corretor incluídos.
+    // Usa três JOINs pra trazer os nomes — sem isso teria só os IDs.
     public function listar(): array
     {
         $sql = 'SELECT c.*, i.titulo AS imovel_titulo, cl.nome AS cliente_nome, co.nome AS corretor_nome
                 FROM contratos c
-                JOIN imoveis i    ON i.id  = c.id_imovel
-                JOIN clientes cl  ON cl.id = c.id_cliente
+                JOIN imoveis i     ON i.id  = c.id_imovel
+                JOIN clientes cl   ON cl.id = c.id_cliente
                 JOIN corretores co ON co.id = c.id_corretor
                 ORDER BY c.id DESC';
         $stmt = $this->conn->query($sql);
@@ -40,9 +30,7 @@ class ContratoDAO
         return $result;
     }
 
-    /**
-     * Busca um contrato pelo ID. Se não achar, retorna null.
-     */
+    // Busca um contrato pelo ID; retorna null se não encontrar
     public function buscarPorId(int $id): ?Contrato
     {
         $stmt = $this->conn->prepare('SELECT * FROM contratos WHERE id = ?');
@@ -51,12 +39,7 @@ class ContratoDAO
         return $row ? $this->toModel($row) : null;
     }
 
-    /**
-     * Salva um contrato no banco. Se tem ID, atualiza; se não tem, cria novo.
-     *
-     * A data_fim pode ser null — contratos de venda não têm prazo de término,
-     * então deixar esse campo vazio é completamente válido.
-     */
+    // Salva o contrato: se tiver ID atualiza, se não tiver cria novo
     public function salvar(Contrato $contrato): void
     {
         if ($contrato->getId()) {
@@ -89,21 +72,15 @@ class ContratoDAO
         }
     }
 
-    /**
-     * Remove um contrato pelo ID.
-     */
+    // Remove o contrato do banco pelo ID
     public function excluir(int $id): void
     {
         $stmt = $this->conn->prepare('DELETE FROM contratos WHERE id = ?');
         $stmt->execute([$id]);
     }
 
-    /**
-     * Converte uma linha do banco em um objeto Contrato.
-     *
-     * Os campos imovel_titulo, cliente_nome e corretor_nome só aparecem
-     * quando a query usou JOINs — por isso o isset() antes de preencher.
-     */
+    // Converte uma linha do banco em um objeto Contrato.
+    // imovel_titulo, cliente_nome e corretor_nome só existem quando a query usou JOINs
     private function toModel(array $row): Contrato
     {
         $contrato = new Contrato();

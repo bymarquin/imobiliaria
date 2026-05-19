@@ -30,7 +30,6 @@ $diasSemana = [
     <?php endif; ?>
 
     <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Imovel
-        <!-- O visitante escolhe qual imóvel quer conhecer -->
         <select name="id_imovel" required class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition">
             <option value="" disabled <?= empty($visita?->getIdImovel()) ? 'selected' : '' ?>>Selecione o imovel</option>
             <?php foreach ($imoveis as $i): ?>

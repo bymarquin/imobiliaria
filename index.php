@@ -50,7 +50,15 @@ if ($entidade !== 'home' && !isset($controllers[$entidade])) {
 
 // Processa o formulário quando o método é POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $entidade !== 'home' && $acao === 'salvar') {
-    $controllers[$entidade]->salvar($_POST);
+    try {
+        $controllers[$entidade]->salvar($_POST);
+    } catch (RuntimeException $e) {
+        $_SESSION['form_erro'] = $e->getMessage();
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+        $destino = 'index.php?entidade=' . $entidade . '&acao=' . ($id > 0 ? 'editar&id=' . $id : 'novo');
+        header('Location: ' . $destino);
+        exit;
+    }
     // Redireciona pra listagem depois de salvar — padrão PRG (Post/Redirect/Get).
     // Sem isso, atualizar a página reenviaria o formulário e duplicaria o registro.
     header('Location: index.php?entidade=' . $entidade . '&acao=listar');
@@ -99,8 +107,48 @@ if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
 <main>
 
     <?php if ($entidade === 'home'): ?>
-        <!-- Tela inicial -->
-        <p class="text-sm text-gray-500">Escolha um modulo no menu acima.</p>
+        <!-- Home orientada ao fluxo do corretor -->
+        <?php
+        $conn = Conexao::getConn();
+        $totalImoveis = (int) $conn->query('SELECT COUNT(*) FROM imoveis')->fetchColumn();
+        $totalClientes = (int) $conn->query('SELECT COUNT(*) FROM clientes')->fetchColumn();
+        $totalVisitas = (int) $conn->query('SELECT COUNT(*) FROM visitas')->fetchColumn();
+        $totalContratos = (int) $conn->query('SELECT COUNT(*) FROM contratos')->fetchColumn();
+        ?>
+
+        <h2>Painel do Corretor</h2>
+        <p>Use os atalhos abaixo para executar o fluxo comercial do dia a dia.</p>
+
+        <div class="home-grid">
+            <div class="home-card">
+                <strong>Imoveis ativos</strong>
+                <p><?= $totalImoveis ?></p>
+                <a href="index.php?entidade=imovel&acao=listar">Ver imoveis</a>
+            </div>
+            <div class="home-card">
+                <strong>Clientes cadastrados</strong>
+                <p><?= $totalClientes ?></p>
+                <a href="index.php?entidade=cliente&acao=listar">Ver clientes</a>
+            </div>
+            <div class="home-card">
+                <strong>Visitas registradas</strong>
+                <p><?= $totalVisitas ?></p>
+                <a href="index.php?entidade=visita&acao=listar">Ver visitas</a>
+            </div>
+            <div class="home-card">
+                <strong>Contratos fechados</strong>
+                <p><?= $totalContratos ?></p>
+                <a href="index.php?entidade=contrato&acao=listar">Ver contratos</a>
+            </div>
+        </div>
+
+        <h2>Atalhos rapidos</h2>
+        <p>
+            <a href="index.php?entidade=cliente&acao=novo">Novo cliente</a> |
+            <a href="index.php?entidade=imovel&acao=novo">Novo imovel</a> |
+            <a href="index.php?entidade=visita&acao=novo">Nova visita</a> |
+            <a href="index.php?entidade=contrato&acao=novo">Novo contrato</a>
+        </p>
 
     <?php elseif ($acao === 'novo' || $acao === 'editar'): ?>
         <?php

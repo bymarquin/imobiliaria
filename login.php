@@ -2,6 +2,7 @@
 session_start();
 require_once __DIR__ . '/config/conexao.php';
 
+// Se já está logado, vai direto pra home
 if (!empty($_SESSION['usuario_id'])) {
     header('Location: index.php');
     exit;
@@ -15,12 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($email !== '' && $senha !== '') {
         $conn = Conexao::getConn();
+
+        // Busca o usuário no banco pelo e-mail e senha
         $stmt = $conn->prepare('SELECT id, nome FROM usuarios WHERE email = ? AND senha = ? LIMIT 1');
         $stmt->execute([$email, $senha]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($usuario) {
-            $_SESSION['usuario_id'] = (int) $usuario['id'];
+            // Login correto: salva o usuário na sessão e redireciona
+            $_SESSION['usuario_id']   = (int) $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['nome'];
             header('Location: index.php');
             exit;
@@ -45,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>Sistema Imobiliaria</p>
 
         <?php if ($erro): ?>
+            <!-- Mostra o erro quando o login falha -->
             <div class="login-erro">
                 <?= htmlspecialchars($erro) ?>
             </div>
@@ -52,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="post">
             <label>E-mail
-                <input type="email" name="email" required placeholder="admin@imobiliaria.com">
+                <input type="email" name="email" required placeholder="Digite seu e-mail">
             </label>
 
             <label>Senha
@@ -61,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button type="submit">Entrar</button>
         </form>
+        <p><a href="registro.php">Criar conta</a></p>
         </div>
     </div>
 </body>

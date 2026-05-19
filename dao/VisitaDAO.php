@@ -2,12 +2,7 @@
 require_once __DIR__ . '/../config/conexao.php';
 require_once __DIR__ . '/../model/Visita.php';
 
-/**
- * Cuida de tudo que envolve visitas agendadas no banco de dados.
- *
- * A listagem usa um JOIN com imoveis pra já trazer o título do imóvel junto,
- * evitando uma segunda consulta só pra mostrar esse dado na tela.
- */
+// Responsável por todas as operações de banco de dados relacionadas a visitas.
 class VisitaDAO
 {
     private PDO $conn;
@@ -17,9 +12,7 @@ class VisitaDAO
         $this->conn = Conexao::getConn();
     }
 
-    /**
-     * Retorna todas as visitas agendadas com o título do imóvel já incluído.
-     */
+    // Retorna todas as visitas com o título do imóvel incluído
     public function listar(): array
     {
         $sql = 'SELECT v.*, i.titulo AS imovel_titulo
@@ -34,9 +27,7 @@ class VisitaDAO
         return $result;
     }
 
-    /**
-     * Busca uma visita pelo ID. Retorna null se não achar.
-     */
+    // Busca uma visita pelo ID; retorna null se não encontrar
     public function buscarPorId(int $id): ?Visita
     {
         $stmt = $this->conn->prepare('SELECT * FROM visitas WHERE id = ?');
@@ -45,9 +36,7 @@ class VisitaDAO
         return $row ? $this->toModel($row) : null;
     }
 
-    /**
-     * Salva uma visita no banco. Se tem ID, atualiza; se não tem, cria nova.
-     */
+    // Salva a visita: se tiver ID atualiza, se não tiver cria nova
     public function salvar(Visita $visita): void
     {
         if ($visita->getId()) {
@@ -80,18 +69,15 @@ class VisitaDAO
         }
     }
 
-    /**
-     * Remove uma visita pelo ID.
-     */
+    // Remove a visita do banco pelo ID
     public function excluir(int $id): void
     {
         $stmt = $this->conn->prepare('DELETE FROM visitas WHERE id = ?');
         $stmt->execute([$id]);
     }
 
-    /**
-     * Converte uma linha do banco em um objeto Visita.
-     */
+    // Converte uma linha do banco em um objeto Visita.
+    // imovel_titulo só existe quando a query usou JOIN
     private function toModel(array $row): Visita
     {
         $visita = new Visita();

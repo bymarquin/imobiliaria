@@ -11,8 +11,14 @@
  */
 
 $editando = $contrato && $contrato->getId();
+$erro = $_SESSION['form_erro'] ?? '';
+unset($_SESSION['form_erro']);
 ?>
 <h2 class="text-xl font-semibold text-gray-900 mb-6"><?= $editando ? 'Editar Contrato' : 'Novo Contrato' ?></h2>
+
+<?php if ($erro): ?>
+    <div class="login-erro"><?= htmlspecialchars($erro) ?></div>
+<?php endif; ?>
 
 <form method="post" action="index.php?entidade=contrato&acao=salvar" class="bg-white border border-gray-200 rounded-lg p-7 max-w-lg flex flex-col gap-5">
 
@@ -22,20 +28,24 @@ $editando = $contrato && $contrato->getId();
     <?php endif; ?>
 
     <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Imovel
-        <!-- Lista de todos os imóveis cadastrados no sistema -->
         <select name="id_imovel" required class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition">
             <option value="" disabled <?= empty($contrato?->getIdImovel()) ? 'selected' : '' ?>>Selecione o imovel</option>
             <?php foreach ($imoveis as $i): ?>
+            <?php
+            $isSelecionado = (($contrato?->getIdImovel() ?? 0) === $i->getId());
+            $isDisponivel = $i->getStatus() === 'disponivel';
+            $isBloqueado = !$isDisponivel && !$isSelecionado;
+            ?>
             <option value="<?= $i->getId() ?>"
-                <?= (($contrato?->getIdImovel() ?? 0) === $i->getId()) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($i->getTitulo()) ?>
+                <?= $isSelecionado ? 'selected' : '' ?>
+                <?= $isBloqueado ? 'disabled' : '' ?>>
+                <?= htmlspecialchars($i->getTitulo()) ?><?= $isDisponivel ? '' : ' (indisponivel)' ?>
             </option>
             <?php endforeach; ?>
         </select>
     </label>
 
     <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Cliente
-        <!-- Lista de todos os clientes cadastrados -->
         <select name="id_cliente" required class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition">
             <option value="" disabled <?= empty($contrato?->getIdCliente()) ? 'selected' : '' ?>>Selecione o cliente</option>
             <?php foreach ($clientes as $c): ?>
@@ -48,7 +58,6 @@ $editando = $contrato && $contrato->getId();
     </label>
 
     <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Corretor
-        <!-- Lista de todos os corretores disponíveis -->
         <select name="id_corretor" required class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition">
             <option value="" disabled <?= empty($contrato?->getIdCorretor()) ? 'selected' : '' ?>>Selecione o corretor</option>
             <?php foreach ($corretores as $c): ?>

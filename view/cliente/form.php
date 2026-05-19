@@ -1,15 +1,11 @@
 <?php
 /**
- * Formulário de cadastro e edição de clientes.
+ * Formulario de cadastro e edicao de clientes.
  *
- * Esta view é compartilhada para criar e editar — a diferença é o $cliente
- * que vem do controller: se for null, estamos criando; se tiver dados, editando.
- *
- * O campo hidden "id" garante que, ao salvar, o controller saiba se deve
- * fazer INSERT (novo) ou UPDATE (edição) no banco.
- *
- * htmlspecialchars() em todos os valores evita XSS — um ataque onde alguém
- * poderia injetar HTML/JavaScript malicioso nos campos.
+ * Segue o mesmo padrao visual e de comportamento dos demais formularios:
+ * - id oculto apenas em edicao
+ * - nomes de campos alinhados ao controller/DAO
+ * - persistencia dos valores no formulario durante edicao
  */
 
 $editando = $cliente && $cliente->getId();
@@ -19,7 +15,6 @@ $editando = $cliente && $cliente->getId();
 <form method="post" action="index.php?entidade=cliente&acao=salvar" class="bg-white border border-gray-200 rounded-lg p-7 max-w-lg flex flex-col gap-5">
 
     <?php if ($editando): ?>
-        <!-- Envia o ID no POST para que o controller saiba que é uma edição -->
         <input type="hidden" name="id" value="<?= $cliente->getId() ?>">
     <?php endif; ?>
 
@@ -48,7 +43,6 @@ $editando = $cliente && $cliente->getId();
     </label>
 
     <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Interesse
-        <!-- Exibe as opções e marca a que já estava salva no banco -->
         <select name="interesse" required class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition">
             <option value="" disabled <?= empty($cliente?->getInteresse()) ? 'selected' : '' ?>>Selecione o interesse</option>
             <?php foreach (['compra', 'aluguel'] as $op): ?>

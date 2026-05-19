@@ -183,3 +183,34 @@ a {
     background: #ffe6e6;
     color: #990000;
 }
+
+.login-ok {
+    margin: 10px 0;
+    padding: 6px;
+    border: 1px solid #2b7a2b;
+    background: #eaffea;
+    color: #1c5a1c;
+}
+
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.home-card {
+    border: 1px solid #999;
+    background: #fafafa;
+    padding: 10px;
+}
+
+.home-card strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.home-card p {
+    font-size: 20px;
+    margin: 0 0 6px;
+}

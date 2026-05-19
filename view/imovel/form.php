@@ -94,7 +94,6 @@ $editando = $imovel && $imovel->getId();
     </label>
 
     <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Proprietario
-        <!-- Lista dinâmica de proprietários vinda do banco via controller -->
         <select name="id_proprietario" required class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition">
             <option value="" disabled <?= empty($imovel?->getIdProprietario()) ? 'selected' : '' ?>>Selecione o proprietario</option>
             <?php foreach ($proprietarios as $p): ?>
