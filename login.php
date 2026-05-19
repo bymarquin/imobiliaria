@@ -39,14 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Imobiliária</title>
+    <title>Login - Painel Administrativo</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <div class="login-wrap">
         <div class="login-box">
-        <h1>Login</h1>
-        <p>Sistema Imobiliaria</p>
+        <h1>Login Administrativo</h1>
+        <p>Acesso restrito ao painel interno da imobiliaria</p>
 
         <?php if ($erro): ?>
             <!-- Mostra o erro quando o login falha -->
@@ -66,8 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button type="submit">Entrar</button>
         </form>
-        <p><a href="registro.php">Criar conta</a></p>
+        <p><a href="registro.php">Criar conta de administrador</a></p>
+        <p><a href="portal.php">Acessar portal de clientes</a></p>
         </div>
     </div>
+
 </body>
 </html>

@@ -85,10 +85,10 @@ if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
 <header>
     <div class="header-inner">
         <div class="left-menu">
-        <h1>Imobiliária</h1>
+        <h1>Imobiliaria</h1>
         <!-- Menu de navegação — aparece em todas as páginas -->
         <nav>
-            <a href="index.php" class="<?= $entidade === 'home' ? 'active' : '' ?>">Home</a>
+            <a href="index.php" class="<?= $entidade === 'home' ? 'active' : '' ?>">Painel</a>
             <a href="index.php?entidade=imovel&acao=listar" class="<?= $entidade === 'imovel' ? 'active' : '' ?>">Imóveis</a>
             <a href="index.php?entidade=proprietario&acao=listar" class="<?= $entidade === 'proprietario' ? 'active' : '' ?>">Proprietários</a>
             <a href="index.php?entidade=corretor&acao=listar" class="<?= $entidade === 'corretor' ? 'active' : '' ?>">Corretores</a>
@@ -98,6 +98,8 @@ if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
         </nav>
         </div>
         <div class="user-box">
+            <a href="portal.php" target="_blank">Portal publico</a>
+            <span>|</span>
             <span><?= htmlspecialchars((string) ($_SESSION['usuario_nome'] ?? '')) ?></span>
             <a href="logout.php">Sair</a>
         </div>
@@ -107,7 +109,7 @@ if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
 <main>
 
     <?php if ($entidade === 'home'): ?>
-        <!-- Home orientada ao fluxo do corretor -->
+        <!-- Home orientada ao fluxo administrativo -->
         <?php
         $conn = Conexao::getConn();
         $totalImoveis = (int) $conn->query('SELECT COUNT(*) FROM imoveis')->fetchColumn();
@@ -116,8 +118,8 @@ if ($entidade !== 'home' && $acao === 'excluir' && isset($_GET['id'])) {
         $totalContratos = (int) $conn->query('SELECT COUNT(*) FROM contratos')->fetchColumn();
         ?>
 
-        <h2>Painel do Corretor</h2>
-        <p>Use os atalhos abaixo para executar o fluxo comercial do dia a dia.</p>
+        <h2>Painel Administrativo</h2>
+        <p>Area restrita para gestao da imobiliaria e operacao comercial.</p>
 
         <div class="home-grid">
             <div class="home-card">

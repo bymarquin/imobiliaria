@@ -4,78 +4,124 @@
 
 body {
     margin: 0;
-    font-family: Tahoma, Verdana, Arial, sans-serif;
-    font-size: 13px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
     color: #000;
-    background: #dcdcdc;
+    background: #bdbdbd;
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.16) 25%, transparent 25%), linear-gradient(-45deg, rgba(255, 255, 255, 0.16) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.05) 75%), linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.05) 75%);
+    background-size: 8px 8px;
 }
 
 header {
-    background: #f2f2f2;
-    border-bottom: 1px solid #999;
+    background: linear-gradient(#f4f4f4, #d8d8d8);
+    border-top: 1px solid #fff;
+    border-bottom: 2px solid #6c6c6c;
 }
 
 .header-inner {
     width: 960px;
     margin: 0 auto;
-    padding: 10px;
+    padding: 8px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    align-items: center;
+    gap: 10px;
 }
 
 .left-menu {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 h1 {
     margin: 0;
-    font-size: 18px;
+    font-size: 22px;
+    color: #000080;
+    text-shadow: 1px 1px 0 #fff;
 }
 
 nav a {
-    color: #003399;
+    color: #0000ee;
     text-decoration: underline;
-    margin-right: 8px;
+    margin-right: 3px;
+    padding: 2px 4px;
 }
 
 nav a.active {
+    background: #fff7b7;
     color: #000;
     font-weight: bold;
     text-decoration: none;
+    border: 1px inset #aaa;
+}
+
+a {
+    color: #0000ee;
+}
+
+a:visited {
+    color: #551a8b;
 }
 
 .user-box {
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .user-box span {
-    margin-right: 8px;
-    color: #333;
-}
-
-.user-box a {
-    color: #003399;
+    margin-right: 6px;
 }
 
 main {
     width: 960px;
-    margin: 16px auto;
+    margin: 14px auto;
     background: #fff;
-    border: 1px solid #999;
-    padding: 14px;
+    border: 2px outset #d6d6d6;
+    padding: 12px;
 }
 
 h2 {
     margin: 0 0 8px;
-    font-size: 18px;
+    font-size: 19px;
+    color: #000080;
+}
+
+h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    color: #000;
 }
 
 p {
     margin: 8px 0;
+}
+
+.home-grid,
+.portal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.home-card,
+.portal-card {
+    border: 2px groove #d4d4d4;
+    background: #f5f5f5;
+    padding: 9px;
+}
+
+.home-card strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.home-card p {
+    font-size: 26px;
+    margin: 0 0 5px;
+    color: #000080;
+    font-weight: bold;
 }
 
 table {
@@ -87,33 +133,38 @@ table {
 th,
 td {
     border: 1px solid #999;
-    padding: 6px;
+    padding: 5px;
     text-align: left;
     vertical-align: top;
 }
 
 th {
-    background: #ececec;
+    background: linear-gradient(#efefef, #dbdbdb);
+    color: #000;
+}
+
+tr:nth-child(even) td {
+    background: #fbfbfb;
 }
 
 form {
-    width: 620px;
-    border: 1px solid #999;
-    background: #fafafa;
-    padding: 12px;
+    width: 640px;
+    border: 2px ridge #d0d0d0;
+    background: #f2f2f2;
+    padding: 10px;
 }
 
 label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 9px;
     font-weight: bold;
 }
 
 input,
 select,
 button {
-    font-family: Tahoma, Verdana, Arial, sans-serif;
-    font-size: 13px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
 }
 
 input[type="text"],
@@ -128,45 +179,62 @@ select {
     width: 100%;
     margin-top: 3px;
     padding: 4px;
-    height: 30px;
-    border: 1px solid #888;
+    height: 28px;
+    border: 1px solid #777;
     border-radius: 0;
     background: #fff;
+    box-shadow: inset 1px 1px 0 #ececec;
 }
 
 select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    border-radius: 0 !important;
+    padding-right: 28px;
+    background-image: linear-gradient(45deg, transparent 50%, #333 50%), linear-gradient(135deg, #333 50%, transparent 50%);
+    background-position: calc(100% - 14px) 11px, calc(100% - 9px) 11px;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
 }
 
 input[type="file"] {
-    display: block;
     margin-top: 4px;
 }
 
 button,
 input[type="submit"] {
-    border: 1px solid #777;
-    background: #e6e6e6;
+    background: linear-gradient(#f2f2f2, #d4d4d4);
+    border: 1px solid;
+    border-color: #fff #666 #666 #fff;
     padding: 5px 10px;
     cursor: pointer;
 }
 
-a {
-    color: #003399;
+button:hover,
+input[type="submit"]:hover {
+    background: linear-gradient(#f7f7f7, #dcdcdc);
+}
+
+button:active,
+input[type="submit"]:active {
+    border-color: #666 #fff #fff #666;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #aaa;
+    margin: 14px 0;
 }
 
 .login-wrap {
     width: 420px;
-    margin: 90px auto;
+    margin: 85px auto;
 }
 
 .login-box {
     background: #fff;
-    border: 1px solid #999;
-    padding: 14px;
+    border: 2px outset #d6d6d6;
+    padding: 12px;
 }
 
 .login-box form {
@@ -179,38 +247,39 @@ a {
 .login-erro {
     margin: 10px 0;
     padding: 6px;
-    border: 1px solid #cc0000;
-    background: #ffe6e6;
-    color: #990000;
+    border: 1px solid #b30000;
+    background: #ffdada;
+    color: #8a0000;
 }
 
 .login-ok {
     margin: 10px 0;
     padding: 6px;
-    border: 1px solid #2b7a2b;
-    background: #eaffea;
-    color: #1c5a1c;
+    border: 1px solid #2d7a2d;
+    background: #deffde;
+    color: #145a14;
 }
 
-.home-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    margin: 12px 0;
-}
+@media (max-width: 980px) {
+    .header-inner,
+    main {
+        width: auto;
+        margin-left: 8px;
+        margin-right: 8px;
+    }
 
-.home-card {
-    border: 1px solid #999;
-    background: #fafafa;
-    padding: 10px;
-}
+    .left-menu {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-.home-card strong {
-    display: block;
-    margin-bottom: 6px;
-}
+    .home-grid,
+    .portal-grid {
+        grid-template-columns: 1fr;
+    }
 
-.home-card p {
-    font-size: 20px;
-    margin: 0 0 6px;
+    form,
+    .login-wrap {
+        width: auto;
+    }
 }
