@@ -88,8 +88,40 @@ $editando = $imovel && $imovel->getId();
             <?php endif; ?>
             <p class="text-xs text-gray-400 normal-case tracking-normal">Enviar nova planta (opcional — substitui a atual):</p>
         <?php endif; ?>
-        <input type="file" name="planta_baixa" accept="image/*,.pdf" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+        <input type="file" name="planta_baixa" id="planta_baixa" accept="image/*,.pdf" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+        <div id="preview_planta" style="display:none; margin-top:6px; border: 2px inset #ccc; padding:4px; background:#f9f9f9;">
+            <p style="margin:0 0 4px; font-size:11px; color:#444;">Preview:</p>
+            <img id="preview_img" src="" alt="Preview da planta" style="max-width:100%; max-height:200px; display:none;">
+            <p id="preview_pdf" style="display:none; font-size:11px; color:#000080; margin:0;">Arquivo PDF selecionado. Preview nao disponivel para PDF.</p>
+        </div>
     </label>
+
+<script>
+document.getElementById('planta_baixa').addEventListener('change', function () {
+    var file = this.files[0];
+    var preview = document.getElementById('preview_planta');
+    var img = document.getElementById('preview_img');
+    var pdf = document.getElementById('preview_pdf');
+
+    if (!file) {
+        preview.style.display = 'none';
+        return;
+    }
+
+    preview.style.display = 'block';
+
+    if (file.type === 'application/pdf') {
+        img.style.display = 'none';
+        pdf.style.display = 'block';
+    } else {
+        pdf.style.display = 'none';
+        img.style.display = 'block';
+        var reader = new FileReader();
+        reader.onload = function (e) { img.src = e.target.result; };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 
     <label class="flex flex-col gap-1.5 text-xs font-medium text-gray-500 uppercase tracking-wide">Proprietario
         <select name="id_proprietario" required class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition">
